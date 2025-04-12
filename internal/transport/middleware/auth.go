@@ -3,12 +3,10 @@ package middlewares
 import (
 	"avito-pvz/internal/constants"
 	myerrors "avito-pvz/internal/constants/errors"
-	"avito-pvz/internal/transport/http/handlers/auth"
+	message "avito-pvz/internal/transport/http/dto/error"
 	"avito-pvz/pkg/logger"
-
 	"context"
 	"encoding/json"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -31,13 +29,16 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	secretKey := []byte(secretKeyString)
 
 	if secretKey == nil {
-		log.Fatal("AUTH_SECRET_KEY not founded")
+		logger.GetLoggerFromCtx(context.Background()).Fatal(context.Background(), "AUTH_SECRET_KEY not founded")
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		accessTokenHeader := r.Header.Get("Authorization") // получение данных из заголовка
 
-		if len(accessTokenHeader) == 0 || !(strings.HasPrefix(accessTokenHeader, "Bearer ")) { // проверка, что токен начинается с корректного обозначения типа
-			log.Printf("Could not get token %s", accessTokenHeader)
+		ctx := r.Context()
+
+		// проверка, что токен начинается с корректного обозначения типа
+		if len(accessTokenHeader) == 0 || !(strings.HasPrefix(accessTokenHeader, "Bearer ")) {
+			logger.GetLoggerFromCtx(ctx).Info(ctx, "Could not get token ", zap.Any("", accessTokenHeader))
 			http.Error(w, "Некорректный jwt", http.StatusBadRequest)
 			return
 		}
@@ -46,15 +47,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		token, err := jwt.ParseWithClaims(accessTokenString, &tokenData{}, func(token *jwt.Token) (interface{}, error) {
 			return secretKey, nil
 		})
-		ctx := r.Context()
 
 		if data, ok := token.Claims.(*tokenData); ok && token.Valid {
 			// Подготовка общих полей для логов
 			logFields := []zap.Field{
 				zap.Any("user_id", data.UserId),
 				zap.Any("user_role", data.Role),
-				zap.Any("Сейчас",time.Now().Unix()),
-				zap.Any("Срок действия",time.Unix(data.CreatedAt, 0).Add(constants.ExpirationTime).Unix()),
+				zap.Any("Сейчас", time.Now().Unix()),
+				zap.Any("Срок действия", time.Unix(data.CreatedAt, 0).Add(constants.ExpirationTime).Unix()),
 			}
 
 			// Проверка роли
@@ -62,7 +62,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				logger.GetLoggerFromCtx(ctx).Info(ctx, "Access denied: insufficient privileges", logFields...)
 
 				w.WriteHeader(http.StatusForbidden)
-				json.NewEncoder(w).Encode(auth.ErrorResponse{
+				json.NewEncoder(w).Encode(message.ErrorResponse{
 					Message: myerrors.ErrAccessDenied.Error(),
 				})
 				return
@@ -75,7 +75,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				logger.GetLoggerFromCtx(ctx).Info(ctx, "Access token expired", logFields...)
 
 				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(auth.ErrorResponse{
+				json.NewEncoder(w).Encode(message.ErrorResponse{
 					Message: myerrors.ErrInvalidOrExpiredJWT.Error(),
 				})
 				return
@@ -89,7 +89,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				zap.Any("token_error", err.Error()))
 
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(auth.ErrorResponse{
+			json.NewEncoder(w).Encode(message.ErrorResponse{
 				Message: myerrors.ErrInvalidOrExpiredJWT.Error(),
 			})
 			return

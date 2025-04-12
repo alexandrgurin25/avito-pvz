@@ -1,21 +1,19 @@
-package pvz
+package product
 
 import (
 	myerrors "avito-pvz/internal/constants/errors"
-	"avito-pvz/internal/entity"
-	message "avito-pvz/internal/transport/http/dto/error"
-	"avito-pvz/internal/transport/http/dto/pvz"
 	"avito-pvz/pkg/logger"
 	"encoding/json"
-	"errors"
 	"net/http"
+
+	message "avito-pvz/internal/transport/http/dto/error"
+	"avito-pvz/internal/transport/http/dto/product"
 
 	"go.uber.org/zap"
 )
 
-func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
-	var req pvz.PvzRequest
-	var res pvz.PvzResponse
+func (h *ProductHandler) AddProduct(w http.ResponseWriter, r *http.Request) {
+	var req *product.AddProductRequest
 
 	ctx := r.Context()
 
@@ -33,44 +31,25 @@ func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.ID == "" || req.City == "" {
+	if req.PvzId == "" || req.Type == ""{
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrPvzIdOrTypeNil.Error()})
 		return
 	}
 
-	newPVZ := &entity.PVZ{
-		UUID: req.ID,
-		City: entity.City{
-			Name: req.City,
-		},
-		CreatedAt: req.RegistrationDate,
-	}
-
-	pvz, err := h.service.CreatePVZ(ctx, newPVZ)
-
+	createdProduct, err := h.service.AddProduct(ctx, req.Type, req.PvzId)
 	if err != nil {
-		status := http.StatusInternalServerError
-		if errors.Is(err, myerrors.ErrCityNotFound) {
-			status = http.StatusBadRequest
-		}
-
-		if errors.Is(err, myerrors.ErrCityNotFound) {
-			status = http.StatusBadRequest
-		}
-
-		if errors.Is(err, myerrors.ErrPVZAlreadyExists) {
-			status = http.StatusBadRequest
-		}
-
-		w.WriteHeader(status)
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(message.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	res.City = pvz.City.Name
-	res.ID = pvz.UUID
-	res.RegistrationDate = pvz.CreatedAt
+	res := &product.ProductResponse{
+		ID: createdProduct.ID,
+		Type: createdProduct.Category,
+		DateTime: createdProduct.DateTime,
+		ReceptionID: createdProduct.ReceptionID,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) // 201

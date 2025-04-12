@@ -1,22 +1,19 @@
-package pvz
+package reseption
 
 import (
 	myerrors "avito-pvz/internal/constants/errors"
-	"avito-pvz/internal/entity"
 	message "avito-pvz/internal/transport/http/dto/error"
-	"avito-pvz/internal/transport/http/dto/pvz"
+	"avito-pvz/internal/transport/http/dto/reception"
 	"avito-pvz/pkg/logger"
 	"encoding/json"
-	"errors"
 	"net/http"
+	"time"
 
 	"go.uber.org/zap"
 )
 
-func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
-	var req pvz.PvzRequest
-	var res pvz.PvzResponse
-
+func (h *ReceptionHandler) CreateReception(w http.ResponseWriter, r *http.Request) {
+	var req reception.CreateReceptionRequest
 	ctx := r.Context()
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -33,44 +30,25 @@ func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.ID == "" || req.City == "" {
+	if req.PvzID == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrPvzIdOrTypeNil.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrPvzIdNil.Error()})
 		return
 	}
 
-	newPVZ := &entity.PVZ{
-		UUID: req.ID,
-		City: entity.City{
-			Name: req.City,
-		},
-		CreatedAt: req.RegistrationDate,
-	}
-
-	pvz, err := h.service.CreatePVZ(ctx, newPVZ)
-
+	createdReception, err := h.service.CreateReception(ctx, req.PvzID)
 	if err != nil {
-		status := http.StatusInternalServerError
-		if errors.Is(err, myerrors.ErrCityNotFound) {
-			status = http.StatusBadRequest
-		}
-
-		if errors.Is(err, myerrors.ErrCityNotFound) {
-			status = http.StatusBadRequest
-		}
-
-		if errors.Is(err, myerrors.ErrPVZAlreadyExists) {
-			status = http.StatusBadRequest
-		}
-
-		w.WriteHeader(status)
+		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(message.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	res.City = pvz.City.Name
-	res.ID = pvz.UUID
-	res.RegistrationDate = pvz.CreatedAt
+	res := &reception.ReceptionResponse{
+		ID:       createdReception.ID,
+		PvzID:    createdReception.PvzID,
+		DateTime: createdReception.DateTime.Format(time.RFC3339),
+		Status:   createdReception.Status,
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) // 201

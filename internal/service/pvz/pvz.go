@@ -2,7 +2,7 @@ package pvz
 
 import (
 	"avito-pvz/internal/entity"
-	pvzR "avito-pvz/internal/repository/pvz"
+	"avito-pvz/internal/repository/pvz"
 	"context"
 )
 
@@ -11,9 +11,9 @@ type PVZService interface {
 }
 
 type pVZService struct {
-	repo pvzR.PvzRepository
+	repo pvz.Repository
 }
 
-func NewService(repo pvzR.PvzRepository) PVZService {
+func NewService(repo pvz.Repository) PVZService {
 	return &pVZService{repo: repo}
 }

@@ -32,7 +32,7 @@ func New(ctx context.Context) (context.Context, error) {
 }
 
 func GetLoggerFromCtx(ctx context.Context) *Logger {
-	log, ok := ctx.Value(ctxKey{}).(*Logger)
+	log, ok := ctx.Value(&ctxKey{}).(*Logger)
 	if !ok || log == nil {
 		tmpLogger, _ := zap.NewDevelopment(zap.AddCaller())
 		return &Logger{tmpLogger}
@@ -44,6 +44,11 @@ func (l *Logger) Info(ctx context.Context, msg string, fields ...zap.Field) {
 	if requestID := ctx.Value(RequestID); requestID != nil {
 		fields = append(fields, zap.String(RequestID, requestID.(string)))
 	}
+	
+	if userId := ctx.Value("userId"); userId != nil {
+		fields = append(fields, zap.Any("userId", userId))
+	}
+
 	l.l.Info(msg, fields...)
 }
 
@@ -51,6 +56,11 @@ func (l *Logger) Error(ctx context.Context, msq string, fields ...zap.Field) {
 	if ctx.Value(RequestID) != nil {
 		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
 	}
+
+	if userId := ctx.Value("userId"); userId != nil {
+		fields = append(fields, zap.Any("userId", userId))
+	}
+
 	l.l.Error(msq, fields...)
 }
 
@@ -58,5 +68,10 @@ func (l *Logger) Fatal(ctx context.Context, msq string, fields ...zap.Field) {
 	if ctx.Value(RequestID) != nil {
 		fields = append(fields, zap.String(RequestID, ctx.Value(RequestID).(string)))
 	}
+
+	if userId := ctx.Value("userId"); userId != nil {
+		fields = append(fields, zap.Any("userId", userId))
+	}
+
 	l.l.Fatal(msq, fields...)
 }
