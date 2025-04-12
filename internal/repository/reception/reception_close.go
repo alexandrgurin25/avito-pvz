@@ -5,15 +5,15 @@ import (
 	"context"
 )
 
-func (r *receptionRepository) UpdateReception(ctx context.Context,
+func (r *receptionRepository) CloseReception(ctx context.Context,
 	reception *entity.Reception) (*entity.Reception, error) {
 
 	var updated entity.Reception
 
 	err := r.db.QueryRow(
 		ctx,
-		` UPDATE receptions
-		SET status = $2, closed_at = $3
+		` UPDATE receivings
+		SET status = $2, end_time = $3
 		WHERE id = $1
 		RETURNING id, pvz_id, start_time, status, end_time`,
 		reception.ID,
