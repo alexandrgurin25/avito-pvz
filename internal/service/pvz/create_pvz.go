@@ -25,6 +25,10 @@ func (s *pVZService) CreatePVZ(ctx context.Context, pvz *entity.PVZ) (*entity.PV
 
 	pvz, err = s.repo.CreatePVZ(ctx, pvz)
 	if err != nil {
+		if errors.Is(err, myerrors.ErrPVZAlreadyExists) {
+			return nil, err
+		}
+
 		logger.GetLoggerFromCtx(ctx).Error(ctx,
 			"failed to create PVZ",
 			zap.Any("pvz", pvz),

@@ -54,7 +54,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 				zap.Any("user_id", data.UserId),
 				zap.Any("user_role", data.Role),
 				zap.Any("Сейчас",time.Now().Unix()),
-				zap.Any("Время выхода",time.Unix(data.CreatedAt, 0).Add(constants.ExpirationTime).Unix()),
+				zap.Any("Срок действия",time.Unix(data.CreatedAt, 0).Add(constants.ExpirationTime).Unix()),
 			}
 
 			// Проверка роли
@@ -70,7 +70,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 			// Проверка срока действия
 			expirationTime := time.Unix(data.CreatedAt, 0).Add(constants.ExpirationTime).Unix()
-			
+
 			if time.Now().Unix() > expirationTime {
 				logger.GetLoggerFromCtx(ctx).Info(ctx, "Access token expired", logFields...)
 
