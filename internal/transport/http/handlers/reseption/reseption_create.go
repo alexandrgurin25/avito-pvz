@@ -26,7 +26,7 @@ func (h *ReceptionHandler) CreateReception(w http.ResponseWriter, r *http.Reques
 		)
 
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrPvzIdNil.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrJsonNotFound.Error()})
 		return
 	}
 

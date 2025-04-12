@@ -1,9 +1,11 @@
 INSERT INTO cities (name) VALUES 
     ('Москва'),
     ('Санкт-Петербург'),
-    ('Казань');
+    ('Казань')
+ON CONFLICT (name) DO NOTHING; 
 
 INSERT INTO categories (name) VALUES 
     ('электроника'),
     ('одежда'),
-    ('обувь');
+    ('обувь')
+ON CONFLICT (name) DO NOTHING;
