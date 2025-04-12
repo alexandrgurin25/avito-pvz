@@ -1,8 +1,12 @@
 package auth
 
-type Handler struct {
+type ErrorResponse struct {
+	Message string `json:"message"`
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+type AuthHandler struct {
+}
+
+func NewHandler() *AuthHandler {
+	return &AuthHandler{}
 }

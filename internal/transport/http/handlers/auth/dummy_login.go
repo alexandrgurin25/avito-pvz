@@ -1,7 +1,8 @@
 package auth
 
 import (
-	errors "avito-pvz/internal/transport/http/dto"
+	"avito-pvz/internal/constants"
+	myerrors "avito-pvz/internal/constants/errors"
 	"avito-pvz/internal/transport/http/dto/auth"
 	"encoding/json"
 	"net/http"
@@ -10,14 +11,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-const employee = "employee"
-const moderator = "moderator"
-
-type ErrorResponse struct {
-	Message string `json:"message"`
-}
-
-func (h *Handler) DummyLogin(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) DummyLogin(w http.ResponseWriter, r *http.Request) {
 	var req auth.DummyLoginRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,9 +20,9 @@ func (h *Handler) DummyLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if req.Role != employee && req.Role != moderator {
+	if req.Role != constants.Employee && req.Role != constants.Moderator {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: errors.ErrInvalidRole.Error()})
+		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrInvalidRole.Error()})
 		return
 	}
 
@@ -37,7 +31,7 @@ func (h *Handler) DummyLogin(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: errors.ErrInvalidGenerateJWT.Error()})
+		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrInvalidGenerateJWT.Error()})
 		return
 	}
 
@@ -48,10 +42,10 @@ func generateJWT(id int, req *auth.DummyLoginRequest) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": id,
 		"role":    &req.Role,
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+		"iat":     time.Now().Add(constants.ExpirationTime).Unix(),
 	})
 
-	tokenString, err := token.SignedString([]byte("avito_test_secret"))
+	tokenString, err := token.SignedString([]byte("avito"))
 
 	if err != nil {
 		return "", err
