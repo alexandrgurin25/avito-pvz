@@ -44,7 +44,7 @@ func (s *productService) AddProduct(
 		return nil, fmt.Errorf("failed to get id category by name: %v", err)
 	}
 	//Добавить продукт
-	product, err := s.productRepository.AddProduct(ctx, pvzId, categoryId)
+	product, err := s.productRepository.AddProduct(ctx, activeReception.ID, categoryId)
 	if err != nil {
 		logger.GetLoggerFromCtx(ctx).Error(ctx, "failed to add product in reception:", zap.Error(err))
 		return nil, fmt.Errorf("failed to add product in reception: %v", err)

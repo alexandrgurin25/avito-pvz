@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS receivings (
 
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    receiving_id UUID NOT NULL REFERENCES pvz(id),
+    receiving_id UUID NOT NULL REFERENCES receivings(id),
     category_id SMALLINT NOT NULL REFERENCES categories(id),
     added_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

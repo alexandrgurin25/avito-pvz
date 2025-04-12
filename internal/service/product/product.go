@@ -10,6 +10,7 @@ import (
 
 type Service interface {
 	AddProduct(ctx context.Context, categoryId string, pvzId string) (*entity.Product, error)
+	DeleteLastProduct(ctx context.Context, productId string) error
 }
 
 type productService struct {

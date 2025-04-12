@@ -10,9 +10,8 @@ import (
 type Repository interface {
 	AddProduct(ctx context.Context, receiving_id string, categoryId int) (*entity.Product, error)
 	GetIdCategoryByName(ctx context.Context, name string) (int, error)
-	// GetLastProduct(ctx context.Context, receptionID string) (*entity.Product, error)
-	// DeleteProduct(ctx context.Context, productID string) error
-	// GetProductsByReception(ctx context.Context, receptionID string) ([]entity.Product, error)
+	DeleteLastProduct(ctx context.Context, productId string) error
+	GetLastProductByReceigingId(ctx context.Context, receptionID string) (*entity.Product, error)
 }
 
 type productRepo struct {
