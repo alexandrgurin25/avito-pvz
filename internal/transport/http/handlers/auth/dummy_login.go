@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	message "avito-pvz/internal/transport/http/dto/error"
+
 	"github.com/golang-jwt/jwt"
 )
 
@@ -16,13 +18,13 @@ func (h *AuthHandler) DummyLogin(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: err.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: err.Error()})
 		return
 	}
 
 	if req.Role != constants.Employee && req.Role != constants.Moderator {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrInvalidRole.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrInvalidRole.Error()})
 		return
 	}
 
@@ -31,7 +33,7 @@ func (h *AuthHandler) DummyLogin(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrInvalidGenerateJWT.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrInvalidGenerateJWT.Error()})
 		return
 	}
 

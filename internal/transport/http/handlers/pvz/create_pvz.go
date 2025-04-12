@@ -3,11 +3,11 @@ package pvz
 import (
 	myerrors "avito-pvz/internal/constants/errors"
 	"avito-pvz/internal/entity"
+	message "avito-pvz/internal/transport/http/dto/error"
 	"avito-pvz/internal/transport/http/dto/pvz"
 	"avito-pvz/pkg/logger"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -29,13 +29,13 @@ func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
 		)
 
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrCityOrIdNil.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrCityOrIdNil.Error()})
 		return
 	}
 
 	if req.ID == "" || req.City == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrCityOrIdNil.Error()})
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrCityOrIdNil.Error()})
 		return
 	}
 
@@ -44,34 +44,37 @@ func (h *PvzHandler) CreatePVZ(w http.ResponseWriter, r *http.Request) {
 		City: entity.City{
 			Name: req.City,
 		},
+		CreatedAt: req.RegistrationDate,
 	}
 
 	pvz, err := h.service.CreatePVZ(ctx, newPVZ)
 
 	if err != nil {
+		status := http.StatusInternalServerError
 		if errors.Is(err, myerrors.ErrCityNotFound) {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrCityNotFound.Error()})
-			return
+			status = http.StatusBadRequest
 		}
 
 		if errors.Is(err, myerrors.ErrCityNotFound) {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{Message: myerrors.ErrCityNotFound.Error()})
-			return
+			status = http.StatusBadRequest
 		}
 
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{Message: err.Error()})
+		if errors.Is(err, myerrors.ErrPVZAlreadyExists) {
+			status = http.StatusBadRequest
+		}
+
+		w.WriteHeader(status)
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: err.Error()})
 		return
 	}
 
 	res.City = pvz.City.Name
 	res.ID = pvz.UUID
-	res.RegistrationDate = pvz.CreatedAt.Format("2006-01-02T15:04:05.000Z")
+	res.RegistrationDate = pvz.CreatedAt
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated) // 201
 	if err := json.NewEncoder(w).Encode(res); err != nil {
-		log.Printf("Failed to encode response: %v", err)
+		logger.GetLoggerFromCtx(ctx).Error(ctx, "Failed to encode response:", zap.Error(err))
 	}
 }

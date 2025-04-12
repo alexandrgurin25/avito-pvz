@@ -6,20 +6,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func (r *pvzRepository) CreatePVZ(ctx context.Context, pvz *entity.PVZ) (*entity.PVZ, error) {
-	var timeNow time.Time
-
-	err := r.pool.QueryRow(
+	_, err := r.pool.Exec(
 		ctx,
-		`INSERT INTO pvz (id, city) VALUES ($1, $2) RETURNING "created_at"`,
+		`INSERT INTO pvz (id, city_id, created_at) VALUES ($1, $2, $3)`,
 		pvz.UUID,
 		pvz.City.Id,
-	).Scan(&timeNow)
+		pvz.CreatedAt,
+	)
 
 	if err != nil {
 		var pgErr *pgconn.PgError
@@ -34,7 +32,7 @@ func (r *pvzRepository) CreatePVZ(ctx context.Context, pvz *entity.PVZ) (*entity
 		City: entity.City{
 			Name: pvz.City.Name,
 		},
-		CreatedAt: timeNow,
+		CreatedAt: pvz.CreatedAt,
 	}, nil
 
 }
