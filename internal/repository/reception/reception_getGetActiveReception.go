@@ -15,6 +15,7 @@ func (r *receptionRepository) GetActiveReception(ctx context.Context, pvzID stri
 		`SELECT id, pvz_id, start_time, status 
 		FROM receivings
 		WHERE pvz_id = $1 AND status = 'in_progress'
+		ORDER BY start_time DESC
 		LIMIT 1`,
 		pvzID,
 	).Scan(&reception.ID, &reception.PvzID, &reception.DateTime, &reception.Status)

@@ -32,6 +32,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		logger.GetLoggerFromCtx(context.Background()).Fatal(context.Background(), "AUTH_SECRET_KEY not founded")
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		accessTokenHeader := r.Header.Get("Authorization") // получение данных из заголовка
 
 		ctx := r.Context()

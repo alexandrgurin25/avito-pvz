@@ -9,7 +9,7 @@ import (
 
 type Service interface {
 	CreateReception(ctx context.Context, pvzID string) (*entity.Reception, error)
-	// CloseReception(ctx context.Context, pvzID string) (*entity.Reception, error)
+	CloseLastReception(ctx context.Context, pvzID string) (*entity.Reception, error)
 }
 
 type receptionService struct {
