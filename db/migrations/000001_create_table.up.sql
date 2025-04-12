@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS receivings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pvz_id UUID NOT NULL REFERENCES pvz(id),
-    status VARCHAR(20) NOT NULL CHECK (status IN ('in_progress', 'closed')) DEFAULT 'in_progress',
+    status VARCHAR(20) NOT NULL CHECK (status IN ('in_progress', 'close')) DEFAULT 'in_progress',
     start_time TIMESTAMP NOT NULL DEFAULT NOW(),
     end_time TIMESTAMP
 );
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS receivings (
 
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    receiving_id UUID NOT NULL REFERENCES pvz(id),
+    receiving_id UUID NOT NULL REFERENCES receivings(id),
     category_id SMALLINT NOT NULL REFERENCES categories(id),
     added_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

@@ -61,17 +61,16 @@ func main() {
 
 	r.With(middlewares.AuthMiddleware, middlewares.RequestIDMiddleware).Post("/receptions", handlerReception.CreateReception)
 
-	r.With(
-		middlewares.AuthMiddleware,
-		middlewares.RequestIDMiddleware,
-	).Route("/pvz", func(r chi.Router) {
-		r.Post("/", handlerPvz.CreatePVZ)
+	r.Route("/pvz", func(r chi.Router) {
+		r.Use(middlewares.AuthMiddleware, middlewares.RequestIDMiddleware)
 
-		r.With().Route("/{pvzId}", func(r chi.Router) {
-			r.Post("/close_last_reception", handlerReception.CloseLastReception)
+		r.Post("/", handlerPvz.CreatePVZ)
+		r.Route("/{pvzId}", func(r chi.Router) {
+			r.Post("/close_last_reception", handlerReception.CloseLastReception) // POST /pvz/{pvzId}/close_last_reception
+			r.Post("/delete_last_product", handlerProduct.DeleteLastProduct)   // POST /pvz/{pvzId}/delete_last_product
 		})
 	})
-	
+
 	r.With(middlewares.AuthMiddleware, middlewares.RequestIDMiddleware).Post("/products", handlerProduct.AddProduct)
 
 	r.Post("/dummyLogin", authHandler.DummyLogin)

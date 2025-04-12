@@ -28,4 +28,6 @@ var (
 	ErrInvalidProductType = errors.New(
 		"invalid product type: must be one of [электроника, одежда, обувь]",
 	)
+
+	ErrNoProductsToDelete = errors.New("no products to delete")
 )

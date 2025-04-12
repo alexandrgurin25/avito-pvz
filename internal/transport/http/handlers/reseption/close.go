@@ -6,15 +6,21 @@ import (
 	reception "avito-pvz/internal/transport/http/dto/reception"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func (h *ReceptionHandler) CloseLastReception(w http.ResponseWriter, r *http.Request) {
+
+	// Получаем параметр из URL
 	pvzID := chi.URLParam(r, "pvzId")
-	fmt.Println(r.Body, "lol")
+
+	if pvzID == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(message.ErrorResponse{Message: myerrors.ErrPvzIdNil.Error()})
+		return
+	}
 
 	closedReception, err := h.service.CloseLastReception(r.Context(), pvzID)
 	if err != nil {
