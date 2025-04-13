@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -39,7 +40,7 @@ func (h *ReceptionHandler) CloseLastReception(w http.ResponseWriter, r *http.Req
 	response := reception.ReceptionResponse{
 		ID:       closedReception.ID,
 		PvzID:    closedReception.PvzID,
-		DateTime: closedReception.DateTime.String(),
+		DateTime: closedReception.DateTime.Truncate(time.Millisecond).Format("2006-01-02T15:04:05.000Z"),
 		Status:   closedReception.Status,
 	}
 

@@ -4,10 +4,12 @@ import (
 	"avito-pvz/internal/entity"
 	"avito-pvz/internal/repository/pvz"
 	"context"
+	"time"
 )
 
 type PVZService interface {
 	CreatePVZ(ctx context.Context, pvz *entity.PVZ) (*entity.PVZ, error)
+	GetAllWithReceptions(ctx context.Context, startDate, endDate *time.Time, page, limit int) ([]entity.PVZ, error)
 }
 
 type pVZService struct {

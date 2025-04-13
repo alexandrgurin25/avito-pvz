@@ -46,7 +46,7 @@ func (h *ReceptionHandler) CreateReception(w http.ResponseWriter, r *http.Reques
 	res := &reception.ReceptionResponse{
 		ID:       createdReception.ID,
 		PvzID:    createdReception.PvzID,
-		DateTime: createdReception.DateTime.Format(time.RFC3339),
+		DateTime: createdReception.DateTime.Truncate(time.Millisecond).Format("2006-01-02T15:04:05.000Z"),
 		Status:   createdReception.Status,
 	}
 
