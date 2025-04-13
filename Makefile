@@ -3,4 +3,7 @@ run:
 
 cover:
 	go test -coverprofile=coverage.out ./...
-	go tool cover -html=coverage
+	go tool cover -html=coverage.out
+
+clean:
+	rm -rf *.out

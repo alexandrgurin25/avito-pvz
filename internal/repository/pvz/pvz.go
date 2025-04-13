@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+//go:generate mockgen -source=pvz.go -destination=mocks/pvz_mock.go -package=mocks
 type Repository interface {
 	CreatePVZ(ctx context.Context, pvz *entity.PVZ) (*entity.PVZ, error)
 	GetCityIdByName(ctx context.Context, city *entity.City) (int, error)
