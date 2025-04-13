@@ -7,12 +7,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+//go:generate mockgen -source=reception.go -destination=mocks/reception_mock.go -package=mocks
 type Repository interface {
 	CreateReception(ctx context.Context, reception *entity.Reception) (*entity.Reception, error)
 	GetActiveReception(ctx context.Context, pvzID string) (*entity.Reception, error)
 	CloseReception(ctx context.Context, reception *entity.Reception) (*entity.Reception, error)
-	// CloseReception(ctx context.Context, pvzID string) (*entity.Reception, error)
-	// GetReceptionByID(ctx context.Context, id string) (*entity.Reception, error)
 }
 
 type receptionRepository struct {

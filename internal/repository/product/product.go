@@ -7,6 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+//go:generate mockgen -source=product.go -destination=mocks/product_mock.go -package=mocks
+
 type Repository interface {
 	AddProduct(ctx context.Context, receiving_id string, categoryId int) (*entity.Product, error)
 	GetIdCategoryByName(ctx context.Context, name string) (int, error)

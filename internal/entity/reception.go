@@ -8,4 +8,5 @@ type Reception struct {
 	DateTime  time.Time // Дата и время проведения приемки
 	CloseTime time.Time
 	Status    string // Статус: "in_progress" или "close"
+	Products  []Product
 }
