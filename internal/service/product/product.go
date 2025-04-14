@@ -18,10 +18,17 @@ type productService struct {
 	productRepository   product.Repository
 	pvzRepository       pvz.Repository
 	receptionRepository reception.Repository
+	typesCache          *cache
 }
 
 func New(productRepository product.Repository,
 	pvzRepository pvz.Repository,
 	receptionRepository reception.Repository) Service {
-	return &productService{productRepository: productRepository, pvzRepository: pvzRepository, receptionRepository: receptionRepository}
+	cache := NewCache()
+	return &productService{
+		productRepository:   productRepository,
+		pvzRepository:       pvzRepository,
+		receptionRepository: receptionRepository,
+		typesCache:          cache,
+	}
 }

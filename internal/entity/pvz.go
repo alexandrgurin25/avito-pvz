@@ -8,8 +8,8 @@ type City struct {
 }
 
 type PVZ struct {
-	UUID      string
-	City      City
-	CreatedAt time.Time
+	UUID       string
+	City       City
+	CreatedAt  time.Time
 	Receptions []*Reception
 }

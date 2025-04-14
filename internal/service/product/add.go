@@ -35,14 +35,19 @@ func (s *productService) AddProduct(
 	}
 
 	//Получить type_id по name type
-	categoryId, err := s.productRepository.GetIdCategoryByName(ctx, categoryName)
-	if err != nil {
-		if errors.Is(err, myerrors.ErrInvalidProductType) {
-			return nil, err
+	categoryId, hasCache := s.typesCache.Get(categoryName)
+	if !hasCache {
+		categoryId, err = s.productRepository.GetIdCategoryByName(ctx, categoryName)
+		if err != nil {
+			if errors.Is(err, myerrors.ErrInvalidProductType) {
+				return nil, err
+			}
+			logger.GetLoggerFromCtx(ctx).Error(ctx, "failed to get id category by name:", zap.Error(err))
+			return nil, fmt.Errorf("failed to get id category by name: %v", err)
 		}
-		logger.GetLoggerFromCtx(ctx).Error(ctx, "failed to get id category by name:", zap.Error(err))
-		return nil, fmt.Errorf("failed to get id category by name: %v", err)
+		s.typesCache.Set(categoryName, categoryId)
 	}
+
 	//Добавить продукт
 	product, err := s.productRepository.AddProduct(ctx, activeReception.ID, categoryId)
 	if err != nil {

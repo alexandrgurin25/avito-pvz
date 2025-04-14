@@ -20,13 +20,14 @@ func (r *pvzRepository) GetPVZsWithFilters(
 		p.id, p.added_at, cat.name
 	FROM pvz
 	JOIN cities c ON pvz.city_id = c.id
-	LEFT JOIN receivings r ON pvz.id = r.pvz_id
-	LEFT JOIN products p ON r.id = p.receiving_id
-	LEFT JOIN categories cat ON p.category_id = cat.id
-	WHERE r.start_time >= $1
-	  AND r.end_time <= $2
+	JOIN receivings r ON pvz.id = r.pvz_id
+	JOIN products p ON r.id = p.receiving_id
+	JOIN categories cat ON p.category_id = cat.id
+	where pvz.id IN (SELECT pvz.id FROM pvz JOIN receivings ON pvz.id = receivings.pvz_id
+	WHERE receivings.start_time >= $1
+	  AND receivings.end_time <= $2
 	ORDER BY pvz.created_at DESC
-	LIMIT $3 OFFSET $4;
+	LIMIT $3 OFFSET $4)
 	`
 
 	rows, err := r.pool.Query(ctx, query, startDate, endDate, limit, (page-1)*limit)
