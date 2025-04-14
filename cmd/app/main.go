@@ -2,13 +2,15 @@ package main
 
 import (
 	"avito-pvz/internal/config"
+	authRepository "avito-pvz/internal/repository/auth"
 	productRepo "avito-pvz/internal/repository/product"
 	pvzRepo "avito-pvz/internal/repository/pvz"
 	receptionRepository "avito-pvz/internal/repository/reception"
+	authService "avito-pvz/internal/service/auth"
 	productService "avito-pvz/internal/service/product"
 	pvzService "avito-pvz/internal/service/pvz"
 	receptionService "avito-pvz/internal/service/reception"
-	"avito-pvz/internal/transport/http/handlers/auth"
+	authHandler "avito-pvz/internal/transport/http/handlers/auth"
 	productHandler "avito-pvz/internal/transport/http/handlers/product"
 	pvzHandler "avito-pvz/internal/transport/http/handlers/pvz"
 	receptionHandler "avito-pvz/internal/transport/http/handlers/reseption"
@@ -53,7 +55,9 @@ func main() {
 	serviceProduct := productService.New(repositoryProduct, repositoryPvz, repositoryReception)
 	handlerProduct := productHandler.New(serviceProduct)
 
-	authHandler := auth.NewHandler()
+	repositoryAuth := authRepository.NewRepository(db)
+	serviceAuth := authService.NewService(repositoryAuth)
+	handlerAuth := authHandler.NewHandler(serviceAuth)
 
 	r := chi.NewRouter()
 
@@ -66,13 +70,15 @@ func main() {
 		r.Get("/", handlerPvz.GetPVZs)
 		r.Post("/", handlerPvz.CreatePVZ)
 		r.Route("/{pvzId}", func(r chi.Router) {
-			r.Post("/close_last_reception", handlerReception.CloseLastReception) 
-			r.Post("/delete_last_product", handlerProduct.DeleteLastProduct)     
+			r.Post("/close_last_reception", handlerReception.CloseLastReception)
+			r.Post("/delete_last_product", handlerProduct.DeleteLastProduct)
 		})
 	})
 
 	r.With(middlewares.AuthMiddleware, middlewares.RequestIDMiddleware).Post("/products", handlerProduct.AddProduct)
 
-	r.Post("/dummyLogin", authHandler.DummyLogin)
+	r.Post("/dummyLogin", handlerAuth.DummyLogin)
+	r.Post("/login", handlerAuth.Login)
+	r.Post("/register", handlerAuth.Register)
 	http.ListenAndServe(":8080", r)
 }

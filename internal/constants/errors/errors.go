@@ -3,31 +3,43 @@ package myerrors
 import "errors"
 
 var (
-	ErrInvalidRole         = errors.New("invalid role")
-	ErrInvalidGenerateJWT  = errors.New("failed to generate token")
-	ErrInvalidOrExpiredJWT = errors.New("invalid or expired token")
-	ErrAccessDenied        = errors.New("access denied")
-)
+	// Ошибки, связанные с ролями и токенами
+	ErrInvalidRole = errors.New("недопустимая роль")
+	// ErrInvalidGenerateJWT  = errors.New("не удалось сгенерировать токен")
+	ErrInvalidOrExpiredJWT = errors.New("недопустимый или истекший токен")
+	ErrAccessDenied        = errors.New("доступ запрещен")
 
-var (
-	ErrJsonNotFound = errors.New("JSON was not found")
+	// Ошибки, связанные с JSON
+	ErrJsonNotFound = errors.New("JSON не найден")
 
-	ErrCityOrIdNil  = errors.New("ID and City are required")
-	ErrCityNotFound = errors.New("city not found")
+	// Ошибки, связанные с городами
+	ErrCityOrIdNil  = errors.New("ID и город обязательны")
+	ErrCityNotFound = errors.New("город не найден")
 
-	ErrPvzIdNil         = errors.New("pvzId are required")
-	ErrInvalidCity      = errors.New("PVZ can only be created in Москва, Санкт-Петербург or Казань")
-	ErrPVZAlreadyExists = errors.New("PVZ already exists")
-	ErrPVZNotFound      = errors.New("PVZ not found")
+	// Ошибки, связанные с ПВЗ (пункты выдачи заказов)
+	ErrPvzIdNil         = errors.New("pvzId обязательны")
+	ErrInvalidCity      = errors.New("ПВЗ может быть создан только в Москве, Санкт-Петербурге или Казани")
+	ErrPVZAlreadyExists = errors.New("ПВЗ уже существует")
+	ErrPVZNotFound      = errors.New("ПВЗ не найден")
 
-	ErrActiveReceptionNotFound = errors.New("invalid request or there is no active reception")
-	ErrActiveReceptionFound    = errors.New("active reception was found")
+	// Ошибки, связанные с активными приемами
+	ErrActiveReceptionNotFound = errors.New("недопустимый запрос или нет активного приема")
+	ErrActiveReceptionFound    = errors.New("активный прием найден")
 
-	ErrPvzIdOrTypeNil = errors.New("pvzId and type are required")
+	// Ошибки, связанные с параметрами ПВЗ
+	ErrPvzIdOrTypeNil = errors.New("pvzId и тип обязательны")
 
+	// Ошибки, связанные с типами продуктов
 	ErrInvalidProductType = errors.New(
-		"invalid product type: must be one of [электроника, одежда, обувь]",
+		"недопустимый тип продукта: должен быть одним из [электроника, одежда, обувь]",
 	)
 
-	ErrNoProductsToDelete = errors.New("no products to delete")
+	// Ошибки, связанные с учетными данными
+	ErrEmailOrPasswordEmpty = errors.New("имя пользователя и пароль обязательны")
+	ErrUserNotFound         = errors.New("пользователь с такими данными не найден")
+	ErrWrongPassword        = errors.New("wrong password")
+	ErrUserAlreadyExists    = errors.New("пользователь с такими данными уже существует")
+
+	// Ошибки, связанные с продуктами
+	ErrNoProductsToDelete = errors.New("нет продуктов для удаления")
 )

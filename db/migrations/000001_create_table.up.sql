@@ -30,12 +30,11 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 
-
--- CREATE TABLE IF NOT EXISTS users (
---     id SERIAL PRIMARY KEY,
---     email TEXT NOT NULL UNIQUE,
---     password_hash TEXT NOT NULL,
---     role VARCHAR(8) NOT NULL CHECK (role IN ('client', 'moderator', 'employee')),
---     pvz_id UUID REFERENCES pvz(id),
---     created_at TIMESTAMP NOT NULL DEFAULT NOW()
--- );
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    role VARCHAR(10) NOT NULL CHECK (role IN ('moderator', 'employee')),
+    pvz_id UUID REFERENCES pvz(id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

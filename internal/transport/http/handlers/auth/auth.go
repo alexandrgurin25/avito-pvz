@@ -1,8 +1,11 @@
 package auth
 
-type AuthHandler struct {
+import "avito-pvz/internal/service/auth"
+
+type authHandler struct {
+	service auth.Service
 }
 
-func NewHandler() *AuthHandler {
-	return &AuthHandler{}
+func NewHandler(service auth.Service) *authHandler {
+	return &authHandler{service: service}
 }

@@ -7,6 +7,8 @@ import (
 	"context"
 )
 
+//go:generate mockgen -source=reception.go -destination=mocks/reception.go -package=mocks
+
 type Service interface {
 	CreateReception(ctx context.Context, pvzID string) (*entity.Reception, error)
 	CloseLastReception(ctx context.Context, pvzID string) (*entity.Reception, error)
