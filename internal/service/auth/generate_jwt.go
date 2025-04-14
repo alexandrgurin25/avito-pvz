@@ -16,12 +16,10 @@ func generateJWT(id int, role string) (string, error) {
 	})
 
 	secretKeyString := os.Getenv("AUTH_SECRET_KEY")
-
 	tokenString, err := token.SignedString([]byte(secretKeyString))
 
 	if err != nil {
 		return "", err
 	}
-
 	return tokenString, nil
 }

@@ -37,6 +37,7 @@ func (h *authHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
 	token, err := h.service.Login(ctx, req.Email, req.Password)
 
 	var res auth.LoginResponse

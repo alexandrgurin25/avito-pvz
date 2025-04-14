@@ -3,6 +3,7 @@ package product
 import (
 	myerrors "avito-pvz/internal/constants/errors"
 	"avito-pvz/internal/entity"
+
 	"avito-pvz/internal/repository/product/mocks"
 	pvz_mocks "avito-pvz/internal/repository/pvz/mocks"
 	reception_mocks "avito-pvz/internal/repository/reception/mocks"
@@ -332,4 +333,3 @@ func TestAddProduct_AddProduct_ReturnsError(t *testing.T) {
 	require.Equal(t, actualErr, err)
 	require.Nil(t, result)
 }
-

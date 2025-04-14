@@ -19,7 +19,22 @@ func New() (*Config, error) {
 	var cfg Config
 
 	if err := cleanenv.ReadConfig("./config/.env", &cfg); err != nil {
+
+		return nil, err
+
+	}
+
+	return &cfg, nil
+}
+
+func NewTest(path string) (*Config, error) {
+	var cfg Config
+
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
 		if err = cleanenv.ReadEnv(&cfg); err != nil {
+			return nil, err
+		}
+		if err != nil {
 			return nil, err
 		}
 	}

@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+//go:generate mockgen -source=auth.go -destination=mocks/auth_mock.go -package=mocks
 type Repository interface {
 	FindUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	CreateUser(ctx context.Context, email string, passwordHash string, role string) (*entity.User, error)

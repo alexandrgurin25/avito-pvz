@@ -35,7 +35,7 @@ var (
 	)
 
 	// Ошибки, связанные с учетными данными
-	ErrEmailOrPasswordEmpty = errors.New("имя пользователя и пароль обязательны")
+	ErrEmailOrPasswordEmpty = errors.New("email пользователя и пароль обязательны")
 	ErrUserNotFound         = errors.New("пользователь с такими данными не найден")
 	ErrWrongPassword        = errors.New("wrong password")
 	ErrUserAlreadyExists    = errors.New("пользователь с такими данными уже существует")
