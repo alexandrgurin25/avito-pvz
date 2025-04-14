@@ -28,6 +28,8 @@ func (r *pvzRepository) GetPVZsWithFilters(
 	  AND receivings.end_time <= $2
 	ORDER BY pvz.created_at DESC
 	LIMIT $3 OFFSET $4)
+	ORDER BY pvz.created_at DESC
+    LIMIT $3 OFFSET $4
 	`
 
 	rows, err := r.pool.Query(ctx, query, startDate, endDate, limit, (page-1)*limit)
@@ -36,16 +38,14 @@ func (r *pvzRepository) GetPVZsWithFilters(
 	}
 	defer rows.Close()
 
-	result := make(map[string]*entity.PVZ)
+	// Используем мапы для группировки данных
+	pvzMap := make(map[string]*entity.PVZ)
+	receptionMap := make(map[string]*entity.Reception)
 
 	for rows.Next() {
 		var (
-			pvzID, cityName  string
-			pvzCreated       time.Time
-			recID, status    *string
-			recStart, recEnd *time.Time
-			prodID, prodType *string
-			prodAddedAt      *time.Time
+			pvzID, cityName, recID, status, prodID, prodType string
+			pvzCreated, recStart, recEnd, prodAddedAt        time.Time
 		)
 
 		err := rows.Scan(&pvzID, &cityName, &pvzCreated,
@@ -56,60 +56,45 @@ func (r *pvzRepository) GetPVZsWithFilters(
 			return nil, err
 		}
 
-		pvz, ok := result[pvzID]
-		if !ok {
-			pvz = &entity.PVZ{
-				UUID:      pvzID,
-				City:      entity.City{Name: cityName},
-				CreatedAt: pvzCreated,
-			}
-			result[pvzID] = pvz
-		}
-
-		if recID != nil {
-			found := false
-			for _, r := range pvz.Receptions {
-				if r.ID == *recID {
-					found = true
-					if prodID != nil {
-						r.Products = append(r.Products, entity.Product{
-							ID:          *prodID,
-							DateTime:    *prodAddedAt,
-							Category:    *prodType,
-							ReceptionID: *recID,
-						})
-					}
-					break
-				}
-			}
-			if !found {
-				reception := &entity.Reception{
-					ID:       *recID,
-					PvzID:    pvzID,
-					DateTime: *recStart,
-					Status:   *status,
-				}
-				if recEnd != nil {
-					reception.CloseTime = *recEnd
-				}
-				if prodID != nil {
-					reception.CloseTime = *recEnd
-					reception.Products = append(reception.Products, entity.Product{
-						ID:          *prodID,
-						DateTime:    *prodAddedAt,
-						Category:    *prodType,
-						ReceptionID: *recID,
-					})
-				}
-				pvz.Receptions = append(pvz.Receptions, reception)
+		// Обработка PVZ
+		if _, exists := pvzMap[pvzID]; !exists {
+			pvzMap[pvzID] = &entity.PVZ{
+				UUID:       pvzID,
+				City:       entity.City{Name: cityName},
+				CreatedAt:  pvzCreated,
+				Receptions: []*entity.Reception{},
 			}
 		}
+
+		// Обработка Reception
+		if _, exists := receptionMap[recID]; !exists {
+			reception := &entity.Reception{
+				ID:        recID,
+				PvzID:     pvzID,
+				DateTime:  recStart,
+				CloseTime: recEnd,
+				Status:    status,
+				Products:  []entity.Product{},
+			}
+			receptionMap[recID] = reception
+			pvzMap[pvzID].Receptions = append(pvzMap[pvzID].Receptions, reception)
+		}
+
+		// Добавление продукта
+		product := entity.Product{
+			ID:          prodID,
+			ReceptionID: recID,
+			DateTime:    prodAddedAt,
+			Category:    prodType,
+		}
+		receptionMap[recID].Products = append(receptionMap[recID].Products, product)
 	}
 
-	var pvzList []entity.PVZ
-	for _, v := range result {
-		pvzList = append(pvzList, *v)
+	// Преобразование мапы в срез
+	result := make([]entity.PVZ, 0, len(pvzMap))
+	for _, pvz := range pvzMap {
+		result = append(result, *pvz)
 	}
 
-	return pvzList, nil
+	return result, nil
 }
