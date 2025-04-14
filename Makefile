@@ -7,3 +7,7 @@ cover:
 
 clean:
 	rm -rf *.out
+
+env: 
+	cp config/example.env.md config/.env
+	cp config/example.env.test.md config/test.env

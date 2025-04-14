@@ -1,13 +1,13 @@
 # Настройки подключения к базе данных PostgreSQL
-POSTGRES_HOST=postgresql
+POSTGRES_HOST=localhost
 
-POSTGRES_PORT=5432
+POSTGRES_PORT=5433
 
 POSTGRES_USER=postgres
 
 POSTGRES_PASSWORD=102104
 
-POSTGRES_DB=avito-pvz
+POSTGRES_DB=avito-pvz-test
 
 POSTGRES_MIN_CONN=5
 
