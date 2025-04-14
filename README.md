@@ -22,10 +22,10 @@
 - `POST /register`: Регистрация нового пользователя.
 - `POST /login`: Авторизация пользователя.
 - `POST /pvz`: Создание нового ПВЗ (только для модераторов).
-- `POST /receiving`: Инициация приемки товаров.
-- `POST /receiving/{id}/products`: Добавление товаров к приемке.
-- `DELETE /receiving/{id}/products/{productId}`: Удаление товара из приемки.
-- `POST /receiving/{id}/close`: Закрытие приемки.
+- `POST /receptions`: Инициация приемки товаров.
+- `POST /products`: Добавление товаров к приемке.
+- `POST /pvz/{pvzId}/delete_last_product`: Удаление последнего товара из приемки.
+- `/pvz/{pvzId}/close_last_reception`: Закрытие приемки.
 - `GET /pvz`: Получение списка ПВЗ с пагинацией и фильтрацией.
 
 ## Схема базы данных
