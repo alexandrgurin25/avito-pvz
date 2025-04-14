@@ -11,5 +11,17 @@ services:
     ports:
       - "5432:5432"
 
+  postgresqlTest:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 102104
+      POSTGRES_DB: avito-pvz-test
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresqlTest/data
+    ports:
+      - "5433:5432"
+
 volumes:
   postgres_data:
