@@ -71,7 +71,5 @@ func TestCreateReception(t *testing.T) {
 
 	_, err = db.Exec(ctx, `DELETE FROM receivings WHERE pvz_id = $1`, pvzID)
 	assert.NoError(t, err)
-	_, err = db.Exec(ctx, `DELETE FROM pvz WHERE city_id = $1`, cityId)
-	assert.NoError(t, err)
 
 }

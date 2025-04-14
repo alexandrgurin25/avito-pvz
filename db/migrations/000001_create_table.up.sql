@@ -38,3 +38,10 @@ CREATE TABLE IF NOT EXISTS users (
     pvz_id UUID REFERENCES pvz(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- Эти индексы НУЖНЫ, т.к. они не связаны с FK:
+CREATE INDEX IF NOT EXISTS idx_receivings_status ON receivings(status); -- Ускоряет фильтрацию по статусу
+CREATE INDEX IF NOT EXISTS idx_receivings_time_range ON receivings(start_time, end_time); -- Для временных запросов
+CREATE INDEX IF NOT EXISTS idx_products_added_at ON products(added_at); -- Для аналитики по дате
+CREATE INDEX IF NOT EXISTS idx_users_role ON users(role); -- Ускоряет фильтрацию по роли
+CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at); -- Для отчетов по регистрации

@@ -1,6 +1,5 @@
 package product
 
-
 import (
 	"avito-pvz/internal/config"
 	"avito-pvz/pkg/postgres"
@@ -24,7 +23,6 @@ func TestDeleteLastProduct_Success(t *testing.T) {
 
 	cfg, err := config.NewTest(pathToEnv)
 	assert.NoError(t, err)
-
 	db, err := postgres.NewTest(ctx, cfg, pathToMigrate)
 	assert.NoError(t, err)
 
@@ -35,12 +33,12 @@ func TestDeleteLastProduct_Success(t *testing.T) {
 	assert.NoError(t, err)
 
 	// 2. Затем добавляем запись в таблицу receivings
-	_, err = db.Exec(ctx, `INSERT INTO receivings (id, pvz_id, status, start_time) VALUES ($1, $2, $3, $4)`, 
+	_, err = db.Exec(ctx, `INSERT INTO receivings (id, pvz_id, status, start_time) VALUES ($1, $2, $3, $4)`,
 		receivingID, pvzID, "in_progress", "2023-01-01 00:00:00")
 	assert.NoError(t, err)
 
 	// 3. Добавляем продукт для тестирования удаления
-	_, err = db.Exec(ctx, `INSERT INTO products (id, receiving_id, category_id) VALUES ($1, $2, $3)`, 
+	_, err = db.Exec(ctx, `INSERT INTO products (id, receiving_id, category_id) VALUES ($1, $2, $3)`,
 		productID, receivingID, categoryID)
 	assert.NoError(t, err)
 

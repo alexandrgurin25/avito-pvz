@@ -5,9 +5,10 @@ import (
 	"context"
 )
 
+//go:generate mockgen -source=auth.go -destination=mocks/auth_mock.go -package=mocks
 type Service interface {
 	CreateDummyLogin(role string) (string, error)
-	Login(ctx context.Context, username string, password string) (string, error)
+	Login(ctx context.Context, email string, password string) (string, error)
 	Register(ctx context.Context, email string, password string, role string) error
 }
 
